@@ -12,6 +12,7 @@ const userForm = document.getElementById('userForm');//userForm הוא הטפס 
 const usernameInput = document.getElementById('username');//username הוא שם המשתמש
 const colorInput = document.getElementById('color');//color הוא הצבע הנבחר
 const logoutBtn = document.getElementById('logoutBtn');//logoutBtn הוא כפתור ההתנתקות
+const clientsCountElement = document.getElementById('clientsCount');//clientsCountElement מציג כמה לקוחות מחוברים
 
 userForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -56,7 +57,7 @@ form.addEventListener('submit', e => {//e הוא האירוע של הטפס
 
 // Listen for incoming messages
 socket.on('user connected', ({ userId }) => {//userId הוא המשתמש שהתחבר
-    h1.textContent += ` - user ${userId}`//h1.textContent += ` - user ${userId}` הוא הפונקציה שמוסיפה את המשתמש שהתחבר לכותרת
+    h1.textContent += ` - user ${userId}`//h1.textContent += ` - user ${userId}` הוא הנוסף לכותרת
 })
 socket.on('send message', msgFromServer => {//msgFromServer הוא ההודעה שהשרת שלח
     const item = document.createElement('li');//item הוא האירוע של הטפס
@@ -80,4 +81,9 @@ socket.on('user disconnected message', data => {
     messages.append(item);
 
     messages.scrollTop = messages.scrollHeight;
+});
+
+// עדכון מונה הלקוחות המחוברים
+socket.on('clients count updated', ({ count }) => {
+    clientsCountElement.textContent = `יש ${count} לקוחות פעילים כרגע`;
 });

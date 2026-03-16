@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 
 let id = 1;
+let activeClients = 0;
 
 export const createSocket = (httpServer) => {
     const io = new Server(httpServer, {
@@ -17,9 +18,11 @@ export const createSocket = (httpServer) => {
         socket.color = null;
         console.log(`user ${socket.userId} connected successfully`);
 
+        // עדכון מונה הלקוחות הפעילים
+        activeClients++;
+        io.emit('clients count updated', { count: activeClients });
+
         // שליחת אירוע לקליינט הנוכחי שהתחבר
-        // בשם שאנחנו בחרנו
-        // הקליינט יקבל את המידע רק אם הוא רשום לאירוע
         socket.emit('user connected', { userId: socket.userId });
 
         socket.on('update user details', (userDetails) => {
@@ -52,6 +55,12 @@ export const createSocket = (httpServer) => {
                 color,
                 msg: newMessage
             });
+        });
+
+        // אירוע ניתוק שמור של Socket.IO
+        socket.on('disconnect', () => {
+            activeClients = Math.max(0, activeClients - 1);
+            io.emit('clients count updated', { count: activeClients });
         });
     });
 };
